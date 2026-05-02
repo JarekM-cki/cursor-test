@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import { AppShell } from './components/layout/AppShell'
 import { useLogcomStore } from './store/useLogcomStore'
+import { DashboardView } from './views/DashboardView'
 import { PlaceholderView } from './views/PlaceholderView'
 
 export default function App() {
@@ -17,7 +18,7 @@ export default function App() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
         >
-          <PlaceholderView moduleId={activeModule} />
+          {activeModule === 'dashboard' ? <DashboardView /> : <PlaceholderView moduleId={activeModule} />}
         </motion.div>
       </AnimatePresence>
     </AppShell>

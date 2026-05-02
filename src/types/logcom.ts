@@ -39,6 +39,14 @@ export interface QuickMetric {
   tone: "success" | "warning" | "danger" | "neutral";
 }
 
+export interface CapabilityMetric {
+  id: string;
+  label: string;
+  value: string;
+  unit: string;
+  detail: string;
+}
+
 export interface ReadinessSlice {
   name: string;
   value: number;
@@ -52,6 +60,12 @@ export interface FuelState {
   dailyBurnLiters: number;
   forecastHours: number;
   criticalThresholdPercent: number;
+  dos: number;
+  trend: Array<{
+    time: string;
+    level: number;
+    forecast: number;
+  }>;
 }
 
 export interface AlertItem {
@@ -68,6 +82,7 @@ export interface LogcomState {
   commander: CommanderProfile;
   navigation: NavigationItem[];
   quickMetrics: QuickMetric[];
+  capabilities: CapabilityMetric[];
   readiness: ReadinessSlice[];
   fuel: FuelState;
   alerts: AlertItem[];
