@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { logcomSeed } from '../data/logcomSeed';
-import type { LogcomState, ModuleId, Soldier, StructureNode } from '../types/logcom';
+import type { EquipmentUpdate, LogcomState, ModuleId, Soldier, StructureNode } from '../types/logcom';
 
 type LogcomActions = {
   setActiveModule: (moduleId: ModuleId) => void;
   togglePoligonMode: () => void;
   upsertSoldier: (nodeId: string, soldier: Soldier) => void;
+  updateEquipment: (equipmentId: string, patch: EquipmentUpdate) => void;
 };
 
 const upsertSoldierInNodes = (nodes: StructureNode[], nodeId: string, soldier: Soldier): StructureNode[] =>
@@ -34,5 +35,9 @@ export const useLogcomStore = create<LogcomState & LogcomActions>((set) => ({
   upsertSoldier: (nodeId, soldier) =>
     set((state) => ({
       structure: upsertSoldierInNodes(state.structure, nodeId, soldier),
+    })),
+  updateEquipment: (equipmentId, patch) =>
+    set((state) => ({
+      equipment: state.equipment.map((item) => (item.id === equipmentId ? { ...item, ...patch } : item)),
     })),
 }));

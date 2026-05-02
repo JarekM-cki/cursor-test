@@ -501,6 +501,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'Gotowy do dyżuru dowodzenia',
     lastInspection: '2026-04-29',
     notes: 'Radiostacja i terminal meldunkowy sprawdzone po synchronizacji LOGSTAT.',
+    serviceHistory: [
+      { date: '2026-04-29', type: 'Obsługa dzienna', description: 'Kontrola łączności, terminala meldunkowego i instalacji 24V.', technician: 'st. szer. CELIŃSKI' },
+      { date: '2026-04-21', type: 'Przegląd okresowy', description: 'Wymiana filtrów oraz test układu chłodzenia.', technician: 'plut. WILCZEK' },
+    ],
   },
   {
     id: 'eq-jelcz-12',
@@ -522,6 +526,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'Sprawny po obsłudze dziennej',
     lastInspection: '2026-05-01',
     notes: 'Zestaw rekomendowany do pierwszego rzutu kolumny marszowej.',
+    serviceHistory: [
+      { date: '2026-05-01', type: 'Obsługa dzienna', description: 'Sprawdzenie opon, oświetlenia konwoju i mocowań ładunku.', technician: 'st. szer. ROGALSKI' },
+      { date: '2026-04-18', type: 'Przegląd napędu', description: 'Kontrola mostów i reduktora po marszu szkolnym.', technician: 'st. kpr. MAZUR' },
+    ],
   },
   {
     id: 'eq-star-14',
@@ -543,6 +551,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'Ograniczona gotowość - układ hamulcowy',
     lastInspection: '2026-04-30',
     notes: 'Wymaga kontroli szczelności pneumatyki przed marszem powyżej 80 km.',
+    serviceHistory: [
+      { date: '2026-04-30', type: 'Diagnoza usterki', description: 'Spadek ciśnienia w obwodzie hamulcowym II.', technician: 'plut. WILCZEK' },
+      { date: '2026-04-16', type: 'Obsługa po marszu', description: 'Mycie podwozia, smarowanie punktów zawieszenia.', technician: 'kpr. JANIK' },
+    ],
   },
   {
     id: 'eq-cd10-41',
@@ -564,6 +576,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'Gotowa do dystrybucji MPS',
     lastInspection: '2026-05-02',
     notes: 'Legalizacja przepływomierza aktualna, komplet węży wydawczych potwierdzony.',
+    serviceHistory: [
+      { date: '2026-05-02', type: 'Kontrola MPS', description: 'Próba wydawcza, plombowanie zaworów i kontrola węży.', technician: 'plut. SAWICKI' },
+      { date: '2026-04-24', type: 'Legalizacja', description: 'Potwierdzono wskazania licznika przepływu.', technician: 'st. szer. KRUPA' },
+    ],
   },
   {
     id: 'eq-kp340',
@@ -585,6 +601,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'Gotowa do wydawania posiłków',
     lastInspection: '2026-04-27',
     notes: 'Zapas palników i naczyń wystarczający na 720 porcji dobowo.',
+    serviceHistory: [
+      { date: '2026-04-27', type: 'Kontrola sanitarna', description: 'Mycie zasobników, kontrola palników i przewodów gazowych.', technician: 'kpr. KACZMAREK' },
+      { date: '2026-04-12', type: 'Próba gotowania', description: 'Test wydajności na 240 porcji w cyklu ćwiczebnym.', technician: 'szer. PAWLAK' },
+    ],
   },
   {
     id: 'eq-wpt-62',
@@ -606,6 +626,10 @@ const equipmentItems: EquipmentItem[] = [
     serviceStatus: 'W obsłudze - wyciągarka i hydraulika',
     lastInspection: '2026-05-02',
     notes: 'Priorytet warsztatu: zakończyć obsługę przed planowaną rotacją konwoju T-03.',
+    serviceHistory: [
+      { date: '2026-05-02', type: 'Obsługa specjalna', description: 'Regulacja hydrauliki podpór i test wyciągarki głównej.', technician: 'st. szer. CELIŃSKI' },
+      { date: '2026-04-25', type: 'Ewakuacja techniczna', description: 'Po zadaniu wymieniono linę pomocniczą i sprawdzono zaczepy.', technician: 'kpr. BIEL' },
+    ],
   },
 ]
 

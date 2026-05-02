@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Users,
   Wrench,
+  X,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -21,6 +22,19 @@ import type {
 
 type StatusFilter = EquipmentStatus | 'all'
 type CategoryFilter = EquipmentCategory | 'all'
+type EquipmentEditState = Pick<
+  EquipmentItem,
+  | 'status'
+  | 'readinessPercent'
+  | 'mileageKm'
+  | 'motohours'
+  | 'fuelLevelPercent'
+  | 'lastInspection'
+  | 'nextService'
+  | 'serviceWindow'
+  | 'serviceStatus'
+  | 'notes'
+>
 
 const statusLabels: Record<EquipmentStatus, string> = {
   ready: 'SPRAWNY',
@@ -84,7 +98,7 @@ function EquipmentCard({
   const crew = resolveCrew(item, soldiers)
 
   return (
-    <motion.button
+      <motion.button
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.045, duration: 0.28 }}
@@ -147,10 +161,12 @@ function EquipmentDetail({
   item,
   soldiers,
   nodes,
+  onOpenCard,
 }: {
   item: EquipmentItem
   soldiers: Soldier[]
   nodes: StructureNode[]
+  onOpenCard: (item: EquipmentItem) => void
 }) {
   const crew = resolveCrew(item, soldiers)
   const node = nodes.find((candidate) => candidate.id === item.assignedNodeId)
@@ -238,7 +254,305 @@ function EquipmentDetail({
           ))}
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => onOpenCard(item)}
+        className="mt-5 w-full rounded-2xl bg-olive px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-olive transition hover:scale-[1.01] poligon:bg-radar poligon:text-night"
+      >
+        Otwórz kartę szczegółową
+      </button>
     </motion.aside>
+  )
+}
+
+function EquipmentDetailModal({
+  item,
+  soldiers,
+  nodes,
+  onClose,
+}: {
+  item: EquipmentItem
+  soldiers: Soldier[]
+  nodes: StructureNode[]
+  onClose: () => void
+}) {
+  const updateEquipment = useLogcomStore((state) => state.updateEquipment)
+  const crew = resolveCrew(item, soldiers)
+  const node = nodes.find((candidate) => candidate.id === item.assignedNodeId)
+  const [form, setForm] = useState<EquipmentEditState>(() => ({
+    status: item.status,
+    readinessPercent: item.readinessPercent,
+    mileageKm: item.mileageKm,
+    motohours: item.motohours,
+    fuelLevelPercent: item.fuelLevelPercent,
+    lastInspection: item.lastInspection,
+    nextService: item.nextService,
+    serviceWindow: item.serviceWindow,
+    serviceStatus: item.serviceStatus,
+    notes: item.notes,
+  }))
+
+  const updateForm = <Key extends keyof EquipmentEditState>(field: Key, value: EquipmentEditState[Key]) => {
+    setForm((current) => ({ ...current, [field]: value }))
+  }
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    updateEquipment(item.id, form)
+    onClose()
+  }
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 grid place-items-end bg-charcoal/60 p-3 backdrop-blur-sm poligon:bg-black/72 lg:place-items-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.form
+        initial={{ opacity: 0, x: 90 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 90 }}
+        transition={{ duration: 0.26 }}
+        onSubmit={handleSubmit}
+        className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/75 bg-parchment p-5 shadow-command poligon:border-poligon-border poligon:bg-poligon-surface"
+      >
+        <div className="flex flex-col gap-4 border-b border-olive/10 pb-5 poligon:border-white/8 md:flex-row md:items-start md:justify-between">
+          <div className="flex gap-4">
+            <div className="grid h-20 w-24 shrink-0 place-items-center rounded-3xl bg-olive font-display text-3xl font-bold uppercase text-white shadow-olive poligon:bg-radar poligon:text-night">
+              {item.silhouette}
+            </div>
+            <div>
+              <p className="font-display text-sm font-bold uppercase tracking-[0.24em] text-army poligon:text-radar">
+                Karta szczegółowa sprzętu
+              </p>
+              <h2 className="mt-1 font-display text-5xl font-bold uppercase leading-none text-charcoal poligon:text-poligon-50">
+                {item.name}
+              </h2>
+              <p className="mt-1 text-sm font-semibold text-field-800 poligon:text-stone-300">
+                {item.model} · {item.registration} · {categoryLabels[item.category]}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="self-start rounded-2xl border border-olive/15 bg-white/75 p-3 text-olive transition hover:bg-white poligon:border-white/10 poligon:bg-white/5 poligon:text-radar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_0.9fr]">
+          <div className="space-y-5">
+            <section className="rounded-3xl border border-olive/10 bg-white/55 p-4 poligon:border-white/8 poligon:bg-white/5">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-army poligon:text-radar">
+                Edycja statusu i resursów
+              </p>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+                  Status
+                  <select
+                    value={form.status}
+                    onChange={(event) => updateForm('status', event.target.value as EquipmentStatus)}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  >
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </label>
+                <NumberField
+                  label="Gotowość [%]"
+                  value={form.readinessPercent}
+                  min={0}
+                  max={100}
+                  onChange={(value) => updateForm('readinessPercent', value)}
+                />
+                <NumberField
+                  label="Przebieg [km]"
+                  value={form.mileageKm}
+                  min={0}
+                  onChange={(value) => updateForm('mileageKm', value)}
+                />
+                <NumberField
+                  label="Motogodziny"
+                  value={form.motohours}
+                  min={0}
+                  onChange={(value) => updateForm('motohours', value)}
+                />
+                <NumberField
+                  label="Paliwo [%]"
+                  value={form.fuelLevelPercent}
+                  min={0}
+                  max={100}
+                  onChange={(value) => updateForm('fuelLevelPercent', value)}
+                />
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+                  Ostatni przegląd
+                  <input
+                    type="date"
+                    value={form.lastInspection}
+                    onChange={(event) => updateForm('lastInspection', event.target.value)}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  />
+                </label>
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+                  Następna obsługa
+                  <input
+                    type="date"
+                    value={form.nextService}
+                    onChange={(event) => updateForm('nextService', event.target.value)}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  />
+                </label>
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+                  Okno obsługowe
+                  <input
+                    value={form.serviceWindow}
+                    onChange={(event) => updateForm('serviceWindow', event.target.value)}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  />
+                </label>
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400 md:col-span-2">
+                  Status obsługi
+                  <input
+                    value={form.serviceStatus}
+                    onChange={(event) => updateForm('serviceStatus', event.target.value)}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  />
+                </label>
+                <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400 md:col-span-2">
+                  Notatki techniczne
+                  <textarea
+                    value={form.notes}
+                    onChange={(event) => updateForm('notes', event.target.value)}
+                    rows={4}
+                    className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-olive/10 bg-white/55 p-4 poligon:border-white/8 poligon:bg-white/5">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-army poligon:text-radar">
+                Historia obsług
+              </p>
+              <div className="mt-4 space-y-3">
+                {item.serviceHistory.map((entry) => (
+                  <div key={`${entry.date}-${entry.type}`} className="rounded-2xl border border-olive/10 bg-parchment/75 p-4 poligon:border-white/8 poligon:bg-white/5">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="font-display text-xl font-bold uppercase text-charcoal poligon:text-poligon-50">{entry.type}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-500">{entry.date} · {entry.technician}</p>
+                      </div>
+                      <span className={`rounded-full border px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] ${statusStyles[item.status]}`}>
+                        {statusLabels[item.status]}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-field-800 poligon:text-stone-300">{entry.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <aside className="space-y-4">
+            <div className="rounded-3xl border border-olive/10 bg-white/55 p-4 poligon:border-white/8 poligon:bg-white/5">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-army poligon:text-radar">
+                Załoga i przydział
+              </p>
+              <div className="mt-4 rounded-2xl border border-olive/10 bg-parchment/75 p-3 text-sm font-bold text-olive poligon:border-white/8 poligon:bg-white/5 poligon:text-radar">
+                {node?.name ?? 'Sekcja nieprzypisana'}
+              </div>
+              <div className="mt-3 space-y-2">
+                {crew.map((soldier) => (
+                  <div key={soldier.id} className="rounded-2xl border border-olive/10 bg-parchment/75 p-3 poligon:border-white/8 poligon:bg-white/5">
+                    <p className="font-display text-xl font-bold uppercase text-charcoal poligon:text-poligon-50">
+                      {formatSoldier(soldier)}
+                    </p>
+                    <p className="text-sm font-semibold text-field-500 poligon:text-stone-400">{soldier.role}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-3xl border border-olive/10 bg-white/55 p-4 poligon:border-white/8 poligon:bg-white/5">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-army poligon:text-radar">
+                Szybki stan
+              </p>
+              <div className="mt-4 grid gap-3">
+                <ResourceBar label="Gotowość" value={form.readinessPercent} />
+                <ResourceBar label="Paliwo" value={form.fuelLevelPercent} />
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-2xl border border-olive/15 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-olive poligon:border-white/10 poligon:text-radar"
+          >
+            Anuluj
+          </button>
+          <button
+            type="submit"
+            className="rounded-2xl bg-olive px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-olive poligon:bg-radar poligon:text-night"
+          >
+            Zapisz kartę
+          </button>
+        </div>
+      </motion.form>
+    </motion.div>
+  )
+}
+
+function NumberField({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string
+  value: number
+  min?: number
+  max?: number
+  onChange: (value: number) => void
+}) {
+  return (
+    <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+      {label}
+      <input
+        type="number"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+      />
+    </label>
+  )
+}
+
+function ResourceBar({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-field-500 poligon:text-stone-500">
+        <span>{label}</span>
+        <span className="font-mono text-olive poligon:text-radar">{value}%</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-sand poligon:bg-white/10">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${value}%` }}
+          transition={{ duration: 0.5 }}
+          className="h-full rounded-full bg-army poligon:bg-radar"
+        />
+      </div>
+    </div>
   )
 }
 
@@ -250,12 +564,18 @@ export function EquipmentView() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all')
   const [selectedId, setSelectedId] = useState(equipment[0]?.id ?? '')
+  const [modalItemId, setModalItemId] = useState<string | null>(null)
 
   const filteredEquipment = equipment.filter((item) => (
     (statusFilter === 'all' || item.status === statusFilter)
     && (categoryFilter === 'all' || item.category === categoryFilter)
   ))
   const selectedItem = equipment.find((item) => item.id === selectedId) ?? filteredEquipment[0] ?? equipment[0]
+  const modalItem = modalItemId ? equipment.find((item) => item.id === modalItemId) : null
+  const openEquipmentModal = (item: EquipmentItem) => {
+    setSelectedId(item.id)
+    setModalItemId(item.id)
+  }
   const readyCount = equipment.filter((item) => item.status === 'ready').length
   const attentionCount = equipment.length - readyCount
   const averageReadiness = Math.round(
@@ -354,7 +674,12 @@ export function EquipmentView() {
               index={index}
               soldiers={soldiers}
               active={selectedItem?.id === item.id}
-              onSelect={setSelectedId}
+              onSelect={(itemId) => {
+                const item = equipment.find((candidate) => candidate.id === itemId)
+                if (item) {
+                  openEquipmentModal(item)
+                }
+              }}
             />
           ))}
           {!filteredEquipment.length ? (
@@ -366,7 +691,12 @@ export function EquipmentView() {
 
         <AnimatePresence mode="wait">
           {selectedItem ? (
-            <EquipmentDetail item={selectedItem} soldiers={soldiers} nodes={nodes} />
+            <EquipmentDetail
+              item={selectedItem}
+              soldiers={soldiers}
+              nodes={nodes}
+              onOpenCard={openEquipmentModal}
+            />
           ) : null}
         </AnimatePresence>
       </div>
@@ -380,6 +710,18 @@ export function EquipmentView() {
         <ShieldCheck className="mr-2 inline h-5 w-5" />
         Moduł 3 ma działającą ewidencję, filtrowanie i kartę szczegółową połączoną ze strukturą organizacyjną.
       </motion.div>
+
+      <AnimatePresence>
+        {modalItem ? (
+          <EquipmentDetailModal
+            key={modalItem.id}
+            item={modalItem}
+            soldiers={soldiers}
+            nodes={nodes}
+            onClose={() => setModalItemId(null)}
+          />
+        ) : null}
+      </AnimatePresence>
     </div>
   )
 }

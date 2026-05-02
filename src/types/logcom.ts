@@ -121,7 +121,31 @@ export interface EquipmentItem {
   serviceWindow: string;
   serviceStatus: string;
   notes: string;
+  serviceHistory: ServiceHistoryEntry[];
 }
+
+export interface ServiceHistoryEntry {
+  date: string;
+  type: string;
+  technician: string;
+  description: string;
+}
+
+export type EquipmentUpdate = Partial<
+  Pick<
+    EquipmentItem,
+    | "status"
+    | "readinessPercent"
+    | "mileageKm"
+    | "motohours"
+    | "fuelLevelPercent"
+    | "lastInspection"
+    | "nextService"
+    | "serviceWindow"
+    | "serviceStatus"
+    | "notes"
+  >
+>;
 
 export interface LogcomState {
   activeModule: ModuleId;
