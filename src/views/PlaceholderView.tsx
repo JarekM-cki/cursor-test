@@ -3,7 +3,12 @@ import { ChevronRight } from 'lucide-react'
 
 import type { ModuleId } from '../types/logcom'
 
-const moduleCopy: Record<Exclude<ModuleId, 'dashboard'>, { title: string; eyebrow: string; description: string }> = {
+const moduleCopy: Record<ModuleId, { title: string; eyebrow: string; description: string }> = {
+  dashboard: {
+    title: 'Pulpit dowodcy',
+    eyebrow: 'MODUL 1',
+    description: 'Widok startowy gotowy pod metryki, gotowosc, paliwo i alerty w kolejnym kroku.',
+  },
   structure: {
     title: 'Struktura organizacyjna',
     eyebrow: 'MODUL 2',
@@ -19,25 +24,15 @@ const moduleCopy: Record<Exclude<ModuleId, 'dashboard'>, { title: string; eyebro
     eyebrow: 'MODUL 4',
     description: 'Mapa sytuacyjna z symbolami wojskowymi, konwojami i punktami logistycznymi.',
   },
-  convoys: {
-    title: 'Transport i konwoje',
-    eyebrow: 'MODUL 5',
-    description: 'Planowanie marszruty, skladow kolumn, czasow przejazdu i ryzyk transportowych.',
-  },
-  reports: {
-    title: 'Generator meldunkow NATO',
-    eyebrow: 'MODUL 6',
-    description: 'Meldunki logistyczne generowane z aktualnego stanu danych kompanii.',
-  },
-  calculator: {
-    title: 'Kalkulator DOS / FCU / j.k.',
-    eyebrow: 'MODUL 7',
-    description: 'Przeliczniki norm naleznosci, zuzycia, jednostek kalkulacyjnych i zapasow.',
+  more: {
+    title: 'Wiecej modulow',
+    eyebrow: 'MODULY 5-7',
+    description: 'Transport, meldunki NATO i kalkulator DOS / FCU dostepne z jednego miejsca w kolejnych etapach prototypu.',
   },
 }
 
 type PlaceholderViewProps = {
-  moduleId: Exclude<ModuleId, 'dashboard'>
+  moduleId: ModuleId
 }
 
 export function PlaceholderView({ moduleId }: PlaceholderViewProps) {

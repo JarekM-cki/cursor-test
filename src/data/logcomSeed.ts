@@ -1,22 +1,18 @@
 import type { LogcomState, ModuleId, NavigationItem } from '../types/logcom'
 import {
   BarChart3,
-  Calculator,
-  ClipboardList,
+  Ellipsis,
   Map,
-  Route,
   Shield,
   Truck,
 } from 'lucide-react'
 
 export const navigationItems: NavigationItem[] = [
-  { id: 'dashboard', label: 'Pulpit dowodcy', shortLabel: 'Pulpit', icon: BarChart3 },
-  { id: 'structure', label: 'Struktura organizacyjna', shortLabel: 'Org', icon: Shield },
-  { id: 'equipment', label: 'Ewidencja sprzetu', shortLabel: 'Sprzet', icon: Truck },
-  { id: 'map', label: 'Mapa taktyczna APP-6', shortLabel: 'Mapa', icon: Map },
-  { id: 'convoys', label: 'Transport i konwoje', shortLabel: 'Konwoje', icon: Route },
-  { id: 'reports', label: 'Meldunki NATO', shortLabel: 'NATO', icon: ClipboardList },
-  { id: 'calculator', label: 'Kalkulator DOS / FCU', shortLabel: 'DOS', icon: Calculator },
+  { id: 'dashboard', label: 'Pulpit', shortLabel: 'Pulpit', description: 'Najwazniejsze liczby w 3 sekundy', icon: BarChart3 },
+  { id: 'structure', label: 'Struktura', shortLabel: 'Org', description: 'Etat, plutony i stan osobowy', icon: Shield },
+  { id: 'equipment', label: 'Sprzet', shortLabel: 'Sprzet', description: 'Sprawnosc i ewidencja wyposazenia', icon: Truck },
+  { id: 'map', label: 'Mapa', shortLabel: 'Mapa', description: 'Sytuacja taktyczna APP-6', icon: Map },
+  { id: 'more', label: 'Wiecej', shortLabel: 'Wiecej', description: 'Transport, meldunki i kalkulator', icon: Ellipsis },
 ]
 
 export const viewTitles: Record<ModuleId, string> = {
@@ -24,9 +20,7 @@ export const viewTitles: Record<ModuleId, string> = {
   structure: 'Struktura organizacyjna',
   equipment: 'Ewidencja sprzetu',
   map: 'Mapa taktyczna APP-6',
-  convoys: 'Transport i konwoje',
-  reports: 'Generator meldunkow NATO',
-  calculator: 'Kalkulator DOS / FCU / j.k.',
+  more: 'Wiecej modulow LOGCOM',
 }
 
 export const fuelTrend = [
@@ -43,10 +37,12 @@ export const logcomSeed: LogcomState = {
   poligonMode: false,
   commander: {
     rank: 'kpt.',
-    name: 'Jaroslaw Malicki',
+    firstName: 'Jaroslaw',
+    lastName: 'MALICKI',
     role: 'Dowodca kompanii logistycznej',
     unit: 'KLog blog brygady',
-    brigade: '17 Brygada Zmechanizowana',
+    brigadeCode: '17 BZ',
+    brigadeName: '17 Brygada Zmechanizowana',
     location: '17 Brygada Zmechanizowana · Miedzyrzecz',
     status: 'Dyżur operacyjny',
   },

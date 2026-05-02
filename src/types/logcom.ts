@@ -5,19 +5,19 @@ export type ModuleId =
   | "structure"
   | "equipment"
   | "map"
-  | "convoys"
-  | "reports"
-  | "calculator";
+  | "more";
 
 export type AlertLevel = "low" | "medium" | "high";
 export type ReadinessStatus = "ready" | "limited" | "down";
 
 export interface CommanderProfile {
   rank: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: string;
   unit: string;
-  brigade: string;
+  brigadeCode: string;
+  brigadeName: string;
   location: string;
   status: string;
 }
@@ -26,6 +26,7 @@ export interface NavigationItem {
   id: ModuleId;
   label: string;
   shortLabel: string;
+  description: string;
   icon: LucideIcon;
 }
 
