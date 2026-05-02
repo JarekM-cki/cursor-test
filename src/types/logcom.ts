@@ -108,12 +108,19 @@ export interface EquipmentItem {
   category: EquipmentCategory;
   silhouette: string;
   status: EquipmentStatus;
+  registration: string;
   location: string;
   assignedNodeId: string;
   crewSoldierIds: string[];
   readinessPercent: number;
   mileageKm: number;
+  motohours: number;
+  fuelLevelPercent: number;
+  lastInspection: string;
   nextService: string;
+  serviceWindow: string;
+  serviceStatus: string;
+  notes: string;
 }
 
 export interface LogcomState {
