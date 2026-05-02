@@ -11,6 +11,8 @@ export type AlertLevel = "low" | "medium" | "high";
 export type ReadinessStatus = "ready" | "limited" | "down";
 export type SoldierStatus = "present" | "leave" | "sl" | "vacancy";
 export type StructureNodeKind = "command" | "staff" | "platoon" | "squad";
+export type EquipmentStatus = "ready" | "service" | "limited" | "down";
+export type EquipmentCategory = "truck" | "tanker" | "command" | "kitchen" | "recovery" | "trailer";
 
 export interface CommanderProfile {
   rank: string;
@@ -92,11 +94,26 @@ export interface Soldier {
 export interface StructureNode {
   id: string;
   name: string;
-  type: StructureNodeKind;
+  category: StructureNodeKind;
   callsign: string;
   description: string;
   soldiers: Soldier[];
   children?: StructureNode[];
+}
+
+export interface EquipmentItem {
+  id: string;
+  name: string;
+  model: string;
+  category: EquipmentCategory;
+  silhouette: string;
+  status: EquipmentStatus;
+  location: string;
+  assignedNodeId: string;
+  crewSoldierIds: string[];
+  readinessPercent: number;
+  mileageKm: number;
+  nextService: string;
 }
 
 export interface LogcomState {
@@ -110,4 +127,5 @@ export interface LogcomState {
   fuel: FuelState;
   alerts: AlertItem[];
   structure: StructureNode[];
+  equipment: EquipmentItem[];
 }

@@ -66,6 +66,24 @@ const functionOptions = [
   { value: 'food', label: 'Zywienie' },
 ]
 
+const roleIconRules: Array<[string, string]> = [
+  ['dowodca', 'command'],
+  ['szef kompanii', 'admin'],
+  ['ewidencji', 'admin'],
+  ['s-4', 'staff'],
+  ['radiotelefonista', 'radio'],
+  ['lacznosc', 'radio'],
+  ['kierowca', 'driver'],
+  ['operator hds', 'equipment'],
+  ['mechanik', 'equipment'],
+  ['diagnosta', 'equipment'],
+  ['mps', 'fuel'],
+  ['cysterny', 'fuel'],
+  ['kuch', 'food'],
+  ['zyw', 'food'],
+  ['druzyny', 'team'],
+]
+
 const defaultFormState: SoldierFormState = {
   status: 'present',
   rank: 'szer.',
@@ -83,10 +101,15 @@ function flattenSoldiers(nodes: StructureNode[]): Soldier[] {
   ])
 }
 
-function countNodes(nodes: StructureNode[], type: StructureNode['type']): number {
+function countNodes(nodes: StructureNode[], category: StructureNode['category']): number {
   return nodes.reduce((sum, node) => (
-    sum + (node.type === type ? 1 : 0) + countNodes(node.children ?? [], type)
+    sum + (node.category === category ? 1 : 0) + countNodes(node.children ?? [], category)
   ), 0)
+}
+
+function getFunctionIcon(role: string) {
+  const normalizedRole = role.toLowerCase()
+  return roleIconRules.find(([needle]) => normalizedRole.includes(needle))?.[1] ?? 'team'
 }
 
 function formatSoldierName(soldier: Soldier) {
@@ -107,18 +130,28 @@ function SoldierCard({
   onEdit: (modalState: ModalState) => void
 }) {
   const Icon = iconMap[soldier.functionIcon] ?? UserRound
+  const isDimmed = soldier.status === 'leave' || soldier.status === 'sl'
+  const isVacancy = soldier.status === 'vacancy'
 
   return (
     <motion.button
       layout
-      whileHover={{ y: -3 }}
+      whileHover={{ y: -3, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       type="button"
       onClick={() => onEdit({ nodeId, nodeName: '', soldier })}
-      className="group rounded-2xl border border-olive/10 bg-parchment/78 p-4 text-left shadow-soft transition poligon:border-white/8 poligon:bg-white/5"
+      className={`group rounded-2xl p-4 text-left shadow-soft transition poligon:border-white/8 ${
+        isVacancy
+          ? 'border-2 border-dashed border-critical/60 bg-critical/12 poligon:border-critical/70 poligon:bg-critical/15'
+          : 'border border-olive/10 bg-parchment/78 poligon:bg-white/5'
+      } ${isDimmed ? 'opacity-75' : ''}`}
     >
       <div className="flex items-start gap-3">
-        <div className="rounded-2xl bg-army/14 p-3 text-olive transition group-hover:bg-olive group-hover:text-white poligon:bg-radar/12 poligon:text-radar poligon:group-hover:bg-radar poligon:group-hover:text-night">
+        <div className={`rounded-2xl p-3 transition group-hover:bg-olive group-hover:text-white poligon:group-hover:bg-radar poligon:group-hover:text-night ${
+          isVacancy
+            ? 'bg-critical/15 text-critical poligon:bg-critical/20 poligon:text-red-200'
+            : 'bg-army/14 text-olive poligon:bg-radar/12 poligon:text-radar'
+        }`}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
@@ -185,7 +218,7 @@ function StructureBranch({
               {node.name}
             </span>
             <span className="mt-1 block text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-500">
-              {node.callsign} · {node.type} · {node.soldiers.length} stanowisk
+              {node.callsign} · {node.category} · {node.soldiers.length} stanowisk
             </span>
           </span>
         </button>
@@ -264,7 +297,27 @@ function SoldierModal({
   }
 
   const updateForm = (field: keyof SoldierFormState, value: string) => {
-    setForm((current) => ({ ...current, [field]: value }))
+    setForm((current) => {
+      const next = { ...current, [field]: value }
+      if (field === 'role') {
+        next.functionIcon = getFunctionIcon(value)
+      }
+      if (field === 'status' && value === 'vacancy') {
+        next.firstName = ''
+        next.lastName = 'WAKAT'
+      }
+      return next
+    })
+  }
+
+  const markVacancy = () => {
+    setForm((current) => ({
+      ...current,
+      status: 'vacancy',
+      firstName: '',
+      lastName: 'WAKAT',
+      functionIcon: getFunctionIcon(current.role),
+    }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -272,6 +325,7 @@ function SoldierModal({
     upsertSoldier(modalState.nodeId, {
       id: modalState.soldier?.id ?? `${modalState.nodeId}-${Date.now()}`,
       ...form,
+      functionIcon: getFunctionIcon(form.role),
       firstName: form.status === 'vacancy' ? '' : form.firstName.trim(),
       lastName: form.status === 'vacancy' ? 'WAKAT' : form.lastName.trim().toUpperCase(),
     })
@@ -311,19 +365,33 @@ function SoldierModal({
           </button>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+        <div className="mt-5 rounded-3xl border border-olive/10 bg-white/45 p-3 poligon:border-white/8 poligon:bg-white/5">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
             Status
-            <select
-              value={form.status}
-              onChange={(event) => updateForm('status', event.target.value)}
-              className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
-            >
-              {Object.entries(statusLabels).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-          </label>
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {Object.entries(statusLabels).map(([value, label]) => {
+              const status = value as SoldierStatus
+              const active = form.status === status
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => updateForm('status', status)}
+                  className={`rounded-2xl border px-3 py-3 text-xs font-black uppercase tracking-[0.14em] transition hover:scale-[1.02] ${
+                    active
+                      ? statusStyles[status]
+                      : 'border-olive/12 bg-parchment/70 text-field-500 poligon:border-white/8 poligon:bg-white/5 poligon:text-stone-400'
+                  }`}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
             Stopien
             <input
@@ -358,18 +426,12 @@ function SoldierModal({
               className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
             />
           </label>
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+          <div className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
             Ikona funkcji
-            <select
-              value={form.functionIcon}
-              onChange={(event) => updateForm('functionIcon', event.target.value)}
-              className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
-            >
-              {functionOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
+            <div className="rounded-2xl border border-olive/15 bg-white/65 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50">
+              Auto: {functionOptions.find((option) => option.value === getFunctionIcon(form.role))?.label ?? 'Druzyna'}
+            </div>
+          </div>
           <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400 md:col-span-2">
             Pojazd
             <input
@@ -380,7 +442,14 @@ function SoldierModal({
           </label>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={markVacancy}
+            className="mr-auto rounded-2xl border border-dashed border-critical/45 bg-critical/10 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-critical poligon:bg-critical/15 poligon:text-red-200"
+          >
+            Oznacz jako WAKAT
+          </button>
           <button
             type="button"
             onClick={onClose}
@@ -403,7 +472,7 @@ function SoldierModal({
 export function StructureView() {
   const structure = useLogcomStore((state) => state.structure)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    () => new Set(['command', 'staff', 'transport-platoon', 'transport-team-1', 'supply-platoon']),
+    () => new Set(['command', 'staff', 'transport-platoon', 'transport-team-1', 'supply-platoon', 'maintenance-platoon']),
   )
   const [modalState, setModalState] = useState<ModalState | null>(null)
 
