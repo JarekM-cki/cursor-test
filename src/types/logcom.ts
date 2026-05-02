@@ -9,6 +9,8 @@ export type ModuleId =
 
 export type AlertLevel = "low" | "medium" | "high";
 export type ReadinessStatus = "ready" | "limited" | "down";
+export type SoldierStatus = "present" | "leave" | "sl" | "vacancy";
+export type StructureNodeKind = "command" | "staff" | "platoon" | "squad";
 
 export interface CommanderProfile {
   rank: string;
@@ -76,6 +78,27 @@ export interface AlertItem {
   severity: AlertLevel;
 }
 
+export interface Soldier {
+  id: string;
+  status: SoldierStatus;
+  rank: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  functionIcon: string;
+  vehicle: string;
+}
+
+export interface StructureNode {
+  id: string;
+  name: string;
+  type: StructureNodeKind;
+  callsign: string;
+  description: string;
+  soldiers: Soldier[];
+  children?: StructureNode[];
+}
+
 export interface LogcomState {
   activeModule: ModuleId;
   poligonMode: boolean;
@@ -86,4 +109,5 @@ export interface LogcomState {
   readiness: ReadinessSlice[];
   fuel: FuelState;
   alerts: AlertItem[];
+  structure: StructureNode[];
 }
