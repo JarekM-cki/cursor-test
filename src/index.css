@@ -1,0 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-condensed: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-olive: #4a5d23;
+  --color-olive-dark: #2f3d16;
+  --color-army: #7c9a3f;
+  --color-coyote: #b6a268;
+  --color-sand: #e7dcc3;
+  --color-parchment: #f7f2e7;
+  --color-charcoal: #171a14;
+  --color-night: #081008;
+  --color-radar: #9fe870;
+  --color-warning: #d28b1f;
+  --color-critical: #b33a2f;
+  --color-logcom-paper: #f7f2e7;
+  --color-logcom-ink: #1d2416;
+  --color-logcom-olive: #4a5d23;
+  --color-logcom-radar: #9fe870;
+  --color-field-200: #d7caa7;
+  --color-field-500: #817755;
+  --color-field-800: #3c4326;
+  --color-poligon-50: #e7f5d2;
+  --color-poligon-950: #081008;
+  --shadow-command: 0 22px 60px rgb(47 61 22 / 0.18);
+  --shadow-soft: 0 14px 32px rgb(47 61 22 / 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #171a14;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  color: #1d2416;
+  background:
+    radial-gradient(circle at top left, rgb(124 154 63 / 0.28), transparent 34rem),
+    linear-gradient(135deg, #f7f2e7 0%, #e7dcc3 48%, #d8c89f 100%);
+}
+
+button {
+  font: inherit;
+}
+
+.poligon body,
+body.poligon {
+  color: #e7f5d2;
+  background:
+    radial-gradient(circle at top right, rgb(159 232 112 / 0.12), transparent 28rem),
+    linear-gradient(135deg, #081008 0%, #11190e 52%, #1d2516 100%);
+}
+
+.grid-map {
+  background-image:
+    linear-gradient(rgb(74 93 35 / 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(74 93 35 / 0.11) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.poligon .grid-map {
+  background-image:
+    linear-gradient(rgb(159 232 112 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(159 232 112 / 0.08) 1px, transparent 1px);
+}
