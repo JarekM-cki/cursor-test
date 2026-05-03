@@ -13,6 +13,7 @@ export type SoldierStatus = "present" | "leave" | "sl" | "vacancy";
 export type StructureNodeKind = "command" | "staff" | "platoon" | "squad";
 export type EquipmentStatus = "ready" | "service" | "limited" | "down";
 export type EquipmentCategory = "truck" | "tanker" | "command" | "kitchen" | "recovery" | "trailer";
+export type ConvoyStatus = "forming" | "moving" | "paused" | "arrived";
 
 export interface CommanderProfile {
   rank: string;
@@ -147,6 +148,42 @@ export type EquipmentUpdate = Partial<
   >
 >;
 
+export interface TransportAsset {
+  id: string;
+  name: string;
+  category: string;
+  available: number;
+  assigned: number;
+  capacityTons: number;
+  status: EquipmentStatus;
+}
+
+export interface TacticalNorm {
+  id: string;
+  name: string;
+  value: string;
+  source: string;
+  note: string;
+}
+
+export interface ConvoyPoint {
+  lat: number;
+  lng: number;
+}
+
+export interface Convoy {
+  id: string;
+  callsign: string;
+  route: string;
+  cargo: string;
+  eta: string;
+  status: ConvoyStatus;
+  progress: number;
+  vehicles: number;
+  commander: string;
+  path: ConvoyPoint[];
+}
+
 export interface LogcomState {
   activeModule: ModuleId;
   poligonMode: boolean;
@@ -159,4 +196,7 @@ export interface LogcomState {
   alerts: AlertItem[];
   structure: StructureNode[];
   equipment: EquipmentItem[];
+  transportAssets: TransportAsset[];
+  tacticalNorms: TacticalNorm[];
+  convoys: Convoy[];
 }

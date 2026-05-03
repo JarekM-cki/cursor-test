@@ -2,10 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import { AppShell } from './components/layout/AppShell'
 import { useLogcomStore } from './store/useLogcomStore'
-import { CalculatorView } from './views/CalculatorView'
 import { DashboardView } from './views/DashboardView'
 import { EquipmentView } from './views/EquipmentView'
 import { MapView } from './views/MapView'
+import { MoreView } from './views/MoreView'
 import { PlaceholderView } from './views/PlaceholderView'
 import { StructureView } from './views/StructureView'
 
@@ -31,7 +31,7 @@ export default function App() {
           ) : activeModule === 'map' ? (
             <MapView />
           ) : activeModule === 'more' ? (
-            <CalculatorView />
+            <MoreView />
           ) : (
             <PlaceholderView moduleId={activeModule} />
           )}

@@ -1,4 +1,13 @@
-import type { EquipmentItem, LogcomState, ModuleId, NavigationItem, StructureNode } from '../types/logcom'
+import type {
+  Convoy,
+  EquipmentItem,
+  LogcomState,
+  ModuleId,
+  NavigationItem,
+  TacticalNorm,
+  TransportAsset,
+  StructureNode,
+} from '../types/logcom'
 import {
   BarChart3,
   Ellipsis,
@@ -633,6 +642,98 @@ const equipmentItems: EquipmentItem[] = [
   },
 ]
 
+const transportAssets: TransportAsset[] = [
+  { id: 'ta-jelcz', name: 'Jelcz 662D / 442', category: 'Samochody ciężarowe', available: 18, assigned: 14, capacityTons: 126, status: 'ready' },
+  { id: 'ta-star', name: 'Star 266', category: 'Transport terenowy', available: 7, assigned: 5, capacityTons: 21, status: 'limited' },
+  { id: 'ta-cd10', name: 'CD-10 / cysterny', category: 'MPS', available: 4, assigned: 3, capacityTons: 40, status: 'ready' },
+  { id: 'ta-honker', name: 'Honker / pojazdy dowodzenia', category: 'Lekki transport', available: 6, assigned: 4, capacityTons: 6, status: 'ready' },
+]
+
+const tacticalNorms: TacticalNorm[] = [
+  {
+    id: 'norm-column',
+    name: 'Kolumna marszowa',
+    value: '25-30 pojazdów',
+    source: 'Kompendium Logistyka SG WP 2014',
+    note: 'Zalecany podział na elementy marszowe po 8-10 pojazdów z odstępem 50-100 m.',
+  },
+  {
+    id: 'norm-bpz',
+    name: 'Czas rozwinięcia BPZ',
+    value: '45 min',
+    source: 'Norma pracy punktu zaopatrzenia',
+    note: 'Od zatrzymania kolumny do rozpoczęcia wydawania MPS i środków materiałowych.',
+  },
+  {
+    id: 'norm-speed',
+    name: 'Prędkość marszu',
+    value: '30-40 km/h',
+    source: 'Marsz po drogach mieszanych',
+    note: 'Dla kolumn logistycznych z pojazdami ciężkimi i cysternami.',
+  },
+  {
+    id: 'norm-halt',
+    name: 'Postój techniczny',
+    value: '10 min / 1 h',
+    source: 'Dyscyplina marszu',
+    note: 'Kontrola ładunku, stanu ogumienia, łączności i zabezpieczenia kolumny.',
+  },
+]
+
+const activeConvoys: Convoy[] = [
+  {
+    id: 'k-12',
+    callsign: 'K-12',
+    route: 'Międzyrzecz -> Wędrzyn -> PZ LOG-3',
+    cargo: 'MPS 18 000 l + części zamienne',
+    eta: '10:45',
+    status: 'moving',
+    progress: 68,
+    vehicles: 11,
+    commander: 'st. kpr. MAZUR',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.425, lng: 15.620 },
+      { lat: 52.403, lng: 15.675 },
+      { lat: 52.382, lng: 15.721 },
+    ],
+  },
+  {
+    id: 'k-15',
+    callsign: 'K-15',
+    route: 'Rejon zaopatrzenia -> Skwierzyna -> punkt dystrybucji',
+    cargo: 'Racje dobowe, woda, zestawy medyczne',
+    eta: '12:20',
+    status: 'forming',
+    progress: 18,
+    vehicles: 7,
+    commander: 'kpr. GAJDA',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.482, lng: 15.539 },
+      { lat: 52.505, lng: 15.506 },
+      { lat: 52.535, lng: 15.492 },
+    ],
+  },
+  {
+    id: 'k-21',
+    callsign: 'K-21',
+    route: 'Warsztat polowy -> Oś ćwiczeń -> punkt ewakuacji',
+    cargo: 'WPT + sekcja remontowa',
+    eta: '09:55',
+    status: 'paused',
+    progress: 43,
+    vehicles: 5,
+    commander: 'kpr. BIEL',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.431, lng: 15.548 },
+      { lat: 52.408, lng: 15.531 },
+      { lat: 52.389, lng: 15.510 },
+    ],
+  },
+]
+
 export const logcomSeed: LogcomState = {
   activeModule: 'dashboard',
   poligonMode: false,
@@ -698,4 +799,7 @@ export const logcomSeed: LogcomState = {
   ],
   structure: companyStructure,
   equipment: equipmentItems,
+  transportAssets,
+  tacticalNorms,
+  convoys: activeConvoys,
 }
