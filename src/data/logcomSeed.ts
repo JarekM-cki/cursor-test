@@ -4,6 +4,7 @@ import type {
   LogcomState,
   ModuleId,
   NavigationItem,
+  NatoReportTemplate,
   TacticalNorm,
   TransportAsset,
   StructureNode,
@@ -734,6 +735,37 @@ const activeConvoys: Convoy[] = [
   },
 ]
 
+const reportTemplates: NatoReportTemplate[] = [
+  {
+    id: 'LOGSITREP',
+    name: 'Logistics Situation Report',
+    description: 'Bieżąca sytuacja logistyczna kompanii: personel, sprzęt, paliwo i ruch konwojów.',
+    priority: 'priority',
+    autoFillPercent: 87,
+  },
+  {
+    id: 'LOGDEFREP',
+    name: 'Logistics Deficiency Report',
+    description: 'Braki i ograniczenia wpływające na zdolność realizacji zadań logistycznych.',
+    priority: 'immediate',
+    autoFillPercent: 84,
+  },
+  {
+    id: 'LOGASSESSREP',
+    name: 'Logistics Assessment Report',
+    description: 'Ocena trendów i przewidywanej zdolności wsparcia w horyzoncie 24-72 h.',
+    priority: 'routine',
+    autoFillPercent: 89,
+  },
+  {
+    id: 'LOGREQ',
+    name: 'Logistics Request',
+    description: 'Wniosek o uzupełnienie zasobów, transport, MPS lub wsparcie remontowe.',
+    priority: 'priority',
+    autoFillPercent: 82,
+  },
+]
+
 export const logcomSeed: LogcomState = {
   activeModule: 'dashboard',
   poligonMode: false,
@@ -802,4 +834,5 @@ export const logcomSeed: LogcomState = {
   transportAssets,
   tacticalNorms,
   convoys: activeConvoys,
+  reportTemplates,
 }

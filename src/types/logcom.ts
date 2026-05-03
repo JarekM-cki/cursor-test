@@ -14,6 +14,7 @@ export type StructureNodeKind = "command" | "staff" | "platoon" | "squad";
 export type EquipmentStatus = "ready" | "service" | "limited" | "down";
 export type EquipmentCategory = "truck" | "tanker" | "command" | "kitchen" | "recovery" | "trailer";
 export type ConvoyStatus = "forming" | "moving" | "paused" | "arrived";
+export type NatoReportType = "LOGSITREP" | "LOGDEFREP" | "LOGASSESSREP" | "LOGREQ";
 
 export interface CommanderProfile {
   rank: string;
@@ -198,6 +199,14 @@ export type ConvoyUpdate = Partial<
   >
 >;
 
+export interface NatoReportTemplate {
+  id: NatoReportType;
+  name: string;
+  description: string;
+  priority: "routine" | "priority" | "immediate";
+  autoFillPercent: number;
+}
+
 export interface LogcomState {
   activeModule: ModuleId;
   poligonMode: boolean;
@@ -213,4 +222,5 @@ export interface LogcomState {
   transportAssets: TransportAsset[];
   tacticalNorms: TacticalNorm[];
   convoys: Convoy[];
+  reportTemplates: NatoReportTemplate[];
 }

@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion'
-import { Calculator, Route } from 'lucide-react'
+import { Calculator, FileText, Route } from 'lucide-react'
 import { useState } from 'react'
 
 import { CalculatorView } from './CalculatorView'
+import { ReportsView } from './ReportsView'
 import { TransportView } from './TransportView'
 
-type MoreModule = 'transport' | 'calculator'
+type MoreModule = 'transport' | 'reports' | 'calculator'
 
 const modules: Array<{ id: MoreModule; label: string; description: string; icon: typeof Route }> = [
   {
@@ -19,6 +20,12 @@ const modules: Array<{ id: MoreModule; label: string; description: string; icon:
     label: 'Kalkulator DOS / FCU',
     description: 'Paliwo, żywność i amunicja z przeliczeniem live.',
     icon: Calculator,
+  },
+  {
+    id: 'reports',
+    label: 'Meldunki NATO',
+    description: 'LOGSITREP, LOGDEFREP, LOGASSESSREP i LOGREQ.',
+    icon: FileText,
   },
 ]
 
@@ -67,7 +74,13 @@ export function MoreView() {
         </div>
       </motion.section>
 
-      {activeModule === 'transport' ? <TransportView /> : <CalculatorView />}
+      {activeModule === 'transport' ? (
+        <TransportView />
+      ) : activeModule === 'reports' ? (
+        <ReportsView />
+      ) : (
+        <CalculatorView />
+      )}
     </div>
   )
 }
