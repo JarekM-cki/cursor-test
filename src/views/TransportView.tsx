@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { motion } from 'framer-motion'
-import { Clock3, MapPin, Package, RadioTower, Route, ShieldCheck, Truck } from 'lucide-react'
+import { Clock3, MapPin, Minus, Package, Plus, RadioTower, Route, ShieldCheck, Truck } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
@@ -30,6 +30,36 @@ const convoyStatusStyles: Record<ConvoyStatus, string> = {
   arrived: 'border-olive/20 bg-parchment text-olive poligon:border-white/10 poligon:bg-white/5 poligon:text-stone-300',
 }
 
+const routePresets: Record<string, { route: string; path: ConvoyPoint[] }> = {
+  wedrzyn: {
+    route: 'Międzyrzecz -> Wędrzyn -> PZ LOG-3',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.425, lng: 15.620 },
+      { lat: 52.403, lng: 15.675 },
+      { lat: 52.382, lng: 15.721 },
+    ],
+  },
+  skwierzyna: {
+    route: 'Rejon zaopatrzenia -> Skwierzyna -> punkt dystrybucji',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.482, lng: 15.539 },
+      { lat: 52.505, lng: 15.506 },
+      { lat: 52.535, lng: 15.492 },
+    ],
+  },
+  recovery: {
+    route: 'Warsztat polowy -> Oś ćwiczeń -> punkt ewakuacji',
+    path: [
+      { lat: 52.444, lng: 15.578 },
+      { lat: 52.431, lng: 15.548 },
+      { lat: 52.408, lng: 15.531 },
+      { lat: 52.389, lng: 15.510 },
+    ],
+  },
+}
+
 function interpolatePoint(path: ConvoyPoint[], progress: number): ConvoyPoint {
   if (path.length <= 1) {
     return path[0] ?? { lat: 52.444, lng: 15.578 }
@@ -48,7 +78,7 @@ function interpolatePoint(path: ConvoyPoint[], progress: number): ConvoyPoint {
   }
 }
 
-function ConvoyMap({ convoys }: { convoys: Convoy[] }) {
+function ConvoyMap({ convoys, activeConvoyId }: { convoys: Convoy[]; activeConvoyId: string }) {
   const mapElementRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const layersRef = useRef<L.LayerGroup | null>(null)
@@ -92,11 +122,12 @@ function ConvoyMap({ convoys }: { convoys: Convoy[] }) {
     layer.clearLayers()
 
     convoys.forEach((convoy) => {
+      const isActive = convoy.id === activeConvoyId
       const route = convoy.path.map((point) => [point.lat, point.lng] as [number, number])
       L.polyline(route, {
-        color: convoy.status === 'moving' ? '#4A5D23' : '#D28B1F',
-        weight: 4,
-        opacity: 0.85,
+        color: isActive ? '#7C9A3F' : convoy.status === 'moving' ? '#4A5D23' : '#D28B1F',
+        weight: isActive ? 6 : 4,
+        opacity: isActive ? 0.95 : 0.72,
         dashArray: '10 12',
       }).addTo(layer)
 
@@ -106,7 +137,7 @@ function ConvoyMap({ convoys }: { convoys: Convoy[] }) {
       const currentPoint = interpolatePoint(convoy.path, pulseProgress)
       const icon = L.divIcon({
         className: '',
-        html: `<div class="relative grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-[#4A5D23] text-[10px] font-black text-white shadow-lg"><span class="absolute h-12 w-12 animate-ping rounded-full bg-[#7C9A3F]/35"></span><span class="relative">${convoy.callsign}</span></div>`,
+        html: `<div class="relative grid ${isActive ? 'h-11 w-11' : 'h-9 w-9'} place-items-center rounded-full border-2 border-white ${isActive ? 'bg-[#7C9A3F] text-[#081008]' : 'bg-[#4A5D23] text-white'} text-[10px] font-black shadow-lg"><span class="absolute ${isActive ? 'h-16 w-16' : 'h-12 w-12'} animate-ping rounded-full bg-[#7C9A3F]/35"></span><span class="relative">${convoy.callsign}</span></div>`,
         iconSize: [36, 36],
         iconAnchor: [18, 18],
       })
@@ -115,7 +146,7 @@ function ConvoyMap({ convoys }: { convoys: Convoy[] }) {
         .bindTooltip(`${convoy.callsign}: ${convoy.cargo}`, { direction: 'top' })
         .addTo(layer)
     })
-  }, [convoys, tick])
+  }, [activeConvoyId, convoys, tick])
 
   return (
     <div className="overflow-hidden rounded-[1.75rem] border border-olive/12 bg-parchment shadow-soft poligon:border-poligon-border poligon:bg-poligon-surface">
@@ -124,13 +155,30 @@ function ConvoyMap({ convoys }: { convoys: Convoy[] }) {
   )
 }
 
-function ConvoyCard({ convoy, index }: { convoy: Convoy; index: number }) {
+function ConvoyCard({
+  convoy,
+  index,
+  active,
+  onSelect,
+}: {
+  convoy: Convoy
+  index: number
+  active: boolean
+  onSelect: () => void
+}) {
   return (
-    <motion.article
+    <motion.button
       initial={{ opacity: 0, x: 26 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.28 }}
-      className="rounded-[1.5rem] border border-white/70 bg-white/82 p-4 shadow-soft poligon:border-poligon-border poligon:bg-poligon-surface/88"
+      whileHover={{ x: 4, scale: 1.01 }}
+      type="button"
+      onClick={onSelect}
+      className={`w-full rounded-[1.5rem] border p-4 text-left shadow-soft transition poligon:bg-poligon-surface/88 ${
+        active
+          ? 'border-army bg-army/12 ring-2 ring-army/25 poligon:border-radar poligon:bg-radar/10'
+          : 'border-white/70 bg-white/82 poligon:border-poligon-border'
+      }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -157,7 +205,149 @@ function ConvoyCard({ convoy, index }: { convoy: Convoy; index: number }) {
         <span className="flex items-center gap-2"><Truck className="h-4 w-4 text-army poligon:text-radar" />{convoy.vehicles} pojazdów</span>
         <span className="flex items-center gap-2"><RadioTower className="h-4 w-4 text-army poligon:text-radar" />{convoy.commander}</span>
       </div>
-    </motion.article>
+    </motion.button>
+  )
+}
+
+function ConvoyDetail({
+  convoy,
+  onUpdate,
+}: {
+  convoy: Convoy
+  onUpdate: (patch: Partial<Convoy>) => void
+}) {
+  const routeKey = Object.entries(routePresets).find(([, preset]) => preset.route === convoy.route)?.[0] ?? 'custom'
+
+  const setRoutePreset = (presetKey: string) => {
+    const preset = routePresets[presetKey]
+    if (preset) {
+      onUpdate({ route: preset.route, path: preset.path })
+    }
+  }
+
+  return (
+    <motion.aside
+      key={convoy.id}
+      initial={{ opacity: 0, x: 34 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25 }}
+      className="rounded-[1.75rem] border border-white/75 bg-white/86 p-5 shadow-command poligon:border-poligon-border poligon:bg-poligon-surface/94"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="font-display text-sm font-bold uppercase tracking-[0.24em] text-army poligon:text-radar">
+            Karta konwoju
+          </p>
+          <h2 className="mt-2 font-display text-5xl font-bold uppercase leading-none text-charcoal poligon:text-poligon-50">
+            {convoy.callsign}
+          </h2>
+          <p className="mt-1 text-sm font-semibold text-field-800 poligon:text-stone-300">{convoy.commander}</p>
+        </div>
+        <span className={`rounded-full border px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.16em] ${convoyStatusStyles[convoy.status]}`}>
+          {convoyStatusLabels[convoy.status]}
+        </span>
+      </div>
+
+      <div className="mt-5 grid gap-4">
+        <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+          Status
+          <select
+            value={convoy.status}
+            onChange={(event) => onUpdate({ status: event.target.value as ConvoyStatus })}
+            className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+          >
+            {Object.entries(convoyStatusLabels).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+          Trasa
+          <select
+            value={routeKey}
+            onChange={(event) => setRoutePreset(event.target.value)}
+            className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+          >
+            <option value="custom">{convoy.route}</option>
+            {Object.entries(routePresets).map(([key, preset]) => (
+              <option key={key} value={key}>{preset.route}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+          Ładunek
+          <input
+            value={convoy.cargo}
+            onChange={(event) => onUpdate({ cargo: event.target.value })}
+            className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+          />
+        </label>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+            ETA
+            <input
+              value={convoy.eta}
+              onChange={(event) => onUpdate({ eta: event.target.value })}
+              className="rounded-2xl border border-olive/15 bg-white/80 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-charcoal outline-none focus:border-army poligon:border-white/10 poligon:bg-white/5 poligon:text-poligon-50"
+            />
+          </label>
+          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.16em] text-field-500 poligon:text-stone-400">
+            Postęp [%]
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={convoy.progress}
+              onChange={(event) => onUpdate({ progress: Number(event.target.value) })}
+              className="accent-olive poligon:accent-radar"
+            />
+          </label>
+        </div>
+
+        <div className="rounded-3xl border border-olive/10 bg-parchment/75 p-4 poligon:border-white/8 poligon:bg-white/5">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-field-500 poligon:text-stone-500">Pojazdy w kolumnie</p>
+            <p className="font-display text-4xl font-bold text-olive poligon:text-radar">{convoy.vehicles}</p>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => onUpdate({ vehicles: Math.max(1, convoy.vehicles - 1) })}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-olive/15 px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-olive transition hover:scale-[1.02] poligon:border-white/10 poligon:text-radar"
+            >
+              <Minus className="h-4 w-4" />
+              Usuń pojazd
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdate({ vehicles: convoy.vehicles + 1 })}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-olive px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-white shadow-olive transition hover:scale-[1.02] poligon:bg-radar poligon:text-night"
+            >
+              <Plus className="h-4 w-4" />
+              Dodaj pojazd
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-3 text-sm font-semibold text-field-800 poligon:text-stone-300">
+          <span className="flex items-center gap-2 rounded-2xl border border-olive/10 bg-white/55 p-3 poligon:border-white/8 poligon:bg-white/5">
+            <Route className="h-4 w-4 text-army poligon:text-radar" />
+            {convoy.route}
+          </span>
+          <span className="flex items-center gap-2 rounded-2xl border border-olive/10 bg-white/55 p-3 poligon:border-white/8 poligon:bg-white/5">
+            <Package className="h-4 w-4 text-army poligon:text-radar" />
+            {convoy.cargo}
+          </span>
+          <span className="flex items-center gap-2 rounded-2xl border border-olive/10 bg-white/55 p-3 poligon:border-white/8 poligon:bg-white/5">
+            <Clock3 className="h-4 w-4 text-army poligon:text-radar" />
+            ETA {convoy.eta}
+          </span>
+        </div>
+      </div>
+    </motion.aside>
   )
 }
 
@@ -165,7 +355,9 @@ export function TransportView() {
   const transportAssets = useLogcomStore((state) => state.transportAssets)
   const tacticalNorms = useLogcomStore((state) => state.tacticalNorms)
   const convoys = useLogcomStore((state) => state.convoys)
+  const updateConvoy = useLogcomStore((state) => state.updateConvoy)
   const [activeTab, setActiveTab] = useState<TransportTab>('overview')
+  const [activeConvoyId, setActiveConvoyId] = useState(convoys[0]?.id ?? '')
 
   const totalAvailable = transportAssets.reduce((sum, item) => sum + item.available, 0)
   const totalAssigned = transportAssets.reduce((sum, item) => sum + item.assigned, 0)
@@ -176,6 +368,7 @@ export function TransportView() {
     { name: 'Obsługa', value: 3, color: '#D28B1F' },
   ], [totalAssigned, totalAvailable])
   const utilization = Math.round((totalAssigned / Math.max(totalAvailable, 1)) * 100)
+  const activeConvoy = convoys.find((convoy) => convoy.id === activeConvoyId) ?? convoys[0]
 
   return (
     <div className="space-y-5">
@@ -299,10 +492,26 @@ export function TransportView() {
       ) : null}
 
       {activeTab === 'convoys' ? (
-        <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <ConvoyMap convoys={convoys} />
+        <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+          <div className="space-y-4">
+            <ConvoyMap convoys={convoys} activeConvoyId={activeConvoy?.id ?? ''} />
+            {activeConvoy ? (
+              <ConvoyDetail
+                convoy={activeConvoy}
+                onUpdate={(patch) => updateConvoy(activeConvoy.id, patch)}
+              />
+            ) : null}
+          </div>
           <div className="space-y-3">
-            {convoys.map((convoy, index) => <ConvoyCard key={convoy.id} convoy={convoy} index={index} />)}
+            {convoys.map((convoy, index) => (
+              <ConvoyCard
+                key={convoy.id}
+                convoy={convoy}
+                index={index}
+                active={convoy.id === activeConvoy?.id}
+                onSelect={() => setActiveConvoyId(convoy.id)}
+              />
+            ))}
           </div>
         </div>
       ) : null}

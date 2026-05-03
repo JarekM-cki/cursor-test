@@ -184,6 +184,20 @@ export interface Convoy {
   path: ConvoyPoint[];
 }
 
+export type ConvoyUpdate = Partial<
+  Pick<
+    Convoy,
+    | "route"
+    | "cargo"
+    | "eta"
+    | "status"
+    | "progress"
+    | "vehicles"
+    | "commander"
+    | "path"
+  >
+>;
+
 export interface LogcomState {
   activeModule: ModuleId;
   poligonMode: boolean;
