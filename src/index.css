@@ -42,6 +42,7 @@
 
 html {
   background: #171a14;
+  scroll-behavior: smooth;
 }
 
 html.poligon {
@@ -70,6 +71,34 @@ button {
   font: inherit;
 }
 
+::selection {
+  background: rgb(124 154 63 / 0.28);
+  color: #171a14;
+}
+
+.poligon ::selection {
+  background: rgb(159 232 112 / 0.32);
+  color: #081008;
+}
+
+:focus-visible {
+  outline: 2px solid #7c9a3f;
+  outline-offset: 3px;
+}
+
+.poligon :focus-visible {
+  outline-color: #9fe870;
+}
+
+* {
+  scrollbar-color: #7c9a3f #e7dcc3;
+  scrollbar-width: thin;
+}
+
+.poligon * {
+  scrollbar-color: #9fe870 #11190e;
+}
+
 .grid-map {
   background-image:
     linear-gradient(rgb(74 93 35 / 0.11) 1px, transparent 1px),
@@ -81,4 +110,39 @@ button {
   background-image:
     linear-gradient(rgb(159 232 112 / 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgb(159 232 112 / 0.08) 1px, transparent 1px);
+}
+
+.leaflet-container {
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  background: #e7dcc3;
+}
+
+.poligon .leaflet-container {
+  background: #081008;
+  filter: saturate(0.78) brightness(0.76) contrast(1.08);
+}
+
+.leaflet-control-zoom a {
+  color: #4a5d23;
+}
+
+.poligon .leaflet-control-zoom a {
+  background: #11190e;
+  color: #9fe870;
+  border-color: rgb(159 232 112 / 0.24);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }

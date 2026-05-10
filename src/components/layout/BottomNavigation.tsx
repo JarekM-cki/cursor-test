@@ -29,7 +29,8 @@ export function BottomNavigation() {
               key={item.id}
               type="button"
               onClick={() => setActiveModule(item.id)}
-              className={`relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[0.66rem] font-bold uppercase tracking-[0.08em] transition sm:min-h-[4.25rem] ${
+              title={item.description}
+              className={`relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[0.66rem] font-bold uppercase tracking-[0.08em] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-army focus-visible:ring-offset-2 focus-visible:ring-offset-white poligon:focus-visible:ring-radar poligon:focus-visible:ring-offset-night sm:min-h-[4.25rem] ${
                 isActive
                   ? poligonMode
                     ? 'text-radar'

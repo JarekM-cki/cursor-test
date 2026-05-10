@@ -39,7 +39,7 @@ export function MoreView() {
         animate={{ opacity: 1, y: 0 }}
         className="rounded-[2rem] border border-white/75 bg-white/80 p-4 shadow-soft backdrop-blur-xl poligon:border-poligon-border poligon:bg-poligon-surface/86"
       >
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-3">
           {modules.map((module) => {
             const Icon = module.icon
             const isActive = activeModule === module.id
@@ -49,7 +49,7 @@ export function MoreView() {
                 key={module.id}
                 type="button"
                 onClick={() => setActiveModule(module.id)}
-                className={`rounded-[1.5rem] border p-4 text-left transition hover:scale-[1.01] ${
+                className={`rounded-[1.5rem] border p-4 text-left transition hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-army focus-visible:ring-offset-2 focus-visible:ring-offset-white poligon:focus-visible:ring-radar poligon:focus-visible:ring-offset-night ${
                   isActive
                     ? 'border-olive bg-army/12 text-olive ring-2 ring-army/20 poligon:border-radar poligon:bg-radar/10 poligon:text-radar'
                     : 'border-olive/10 bg-parchment/72 text-field-800 poligon:border-white/8 poligon:bg-white/5 poligon:text-stone-300'

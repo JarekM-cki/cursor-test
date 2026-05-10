@@ -34,14 +34,14 @@ export function TopBanner() {
           </div>
         </div>
 
-        <div className="hidden items-center gap-2 rounded-2xl border border-olive/15 bg-white/62 px-3 py-2 shadow-soft poligon:border-radar/15 poligon:bg-white/5 lg:flex">
+        <div className="hidden items-center gap-2 rounded-2xl border border-olive/15 bg-white/62 px-3 py-2 shadow-soft poligon:border-radar/15 poligon:bg-white/5 sm:flex">
           <motion.span
             className="h-2.5 w-2.5 rounded-full bg-army poligon:bg-radar"
             animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <Wifi className="h-4 w-4 text-army poligon:text-radar" />
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-olive poligon:text-radar">
+          <Wifi className="hidden h-4 w-4 text-army poligon:text-radar md:block" />
+          <span className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.16em] text-olive poligon:text-radar md:text-xs">
             SYNC 08:42 · ONLINE
           </span>
         </div>
@@ -63,6 +63,7 @@ export function TopBanner() {
             className="inline-flex items-center gap-2 rounded-2xl border border-olive/15 bg-white/75 px-3 py-3 text-olive shadow-soft transition-colors hover:border-army hover:bg-white poligon:border-radar/30 poligon:bg-radar/10 poligon:text-radar poligon:hover:bg-radar/15 sm:px-4"
             onClick={togglePoligonMode}
             aria-label="Przełącz tryb POLIGON"
+            aria-pressed={poligonMode}
             type="button"
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.96 }}
